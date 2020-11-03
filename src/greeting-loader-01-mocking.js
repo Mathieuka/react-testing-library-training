@@ -6,6 +6,7 @@ function GreetingLoader() {
   async function loadGreetingForInput(e) {
     e.preventDefault()
     const {data} = await loadGreeting(e.target.elements.name.value)
+    if (!data) throw new Error('Error: no data provided')
     setGreeting(data.greeting)
   }
   return (
