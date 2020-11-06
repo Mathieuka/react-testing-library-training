@@ -29,11 +29,13 @@ test('call reportError and render that there was a problem', async () => {
   // mock the Promise returned by mockReportError
   mockReportError.mockResolvedValueOnce({success: true})
 
-  const {rerender, getByText, queryByText, getByRole, queryByRole} = await render(
-    <ErrorBoundary>
-      <Bomb shouldThrow={true} />
-    </ErrorBoundary>,
-  )
+  const {
+    rerender,
+    getByText,
+    queryByText,
+    getByRole,
+    queryByRole,
+  } = await render(<Bomb shouldThrow={true} />, {wrapper: ErrorBoundary})
 
   const error = expect.any(Error)
   const info = {componentStack: expect.stringContaining('Bomb')}
@@ -48,11 +50,7 @@ test('call reportError and render that there was a problem', async () => {
   console.error.mockClear()
   mockReportError.mockClear()
 
-  await rerender(
-    <ErrorBoundary>
-      <Bomb />
-    </ErrorBoundary>,
-  )
+  await rerender(<Bomb />)
 
   fireEvent.click(getByText(/try again/i))
   expect(mockReportError).not.toHaveBeenCalled()
