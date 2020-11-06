@@ -7,17 +7,17 @@ class ErrorBoundary extends React.Component {
     this.setState({hasError: true})
     reportError(error, info)
   }
+
   tryAgain = () => this.setState({hasError: false})
+  
   render() {
     return this.state.hasError ? (
       <div>
         <div role="alert">There was a problem.</div>{' '}
         <button onClick={this.tryAgain}>Try again?</button>
       </div>
-    ) : (
-      this.props.children
-    )
+    ) : this.props.children
   }
 }
-
+ 
 export {ErrorBoundary}
