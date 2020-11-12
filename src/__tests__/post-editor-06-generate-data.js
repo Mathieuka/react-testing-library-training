@@ -1,15 +1,9 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {Redirect as MockRedirect} from 'react-router'
-import {Editor} from '../post-editor-05-dates'
+import {build, fake, sequence} from 'test-data-bot'
+import {Editor} from '../post-editor-06-generate-data'
 import {savePost as mockSavePost} from '../api'
-
-/*  /!\
-    the technic here is to get the timestamp before the function is call `preDate` and 
-    after the function is called `postDate`, after that we get the arguments `date` in the 
-    calls object (calls object is the argument of the original function) and ensure 
-    that `preDate` is lesser or equal of `date` and `postDate`is greater or equal of `date`
-*/
 
 jest.mock('../api')
 jest.mock('react-router', () => {
@@ -22,19 +16,25 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
+const postBuilder = build('Post').fields({
+  title: fake((f) => f.lorem.words()),
+  content: fake((f) => f.lorem.paragraphs().replace(/\s/g, '')),
+  tags: fake((f) => [f.lorem.words(), f.lorem.words(), f.lorem.words()]),
+})
+
+const userBuilder = build('User').fields({
+  id: sequence((s) => `user-${s}`),
+})
+
 test('render a form with title, content, tags and a submit button and mock react router', async () => {
   mockSavePost.mockResolvedValueOnce()
-  const fakeUser = {id: 1234}
+  const fakeUser = userBuilder()
 
   const {getByText, getByLabelText} = render(<Editor user={fakeUser} />)
 
-  const fakePost = {
-    title: 'Test Title',
-    content: 'Test Content',
-    tags: ['Tag1', 'Tag2'],
-    authorId: 1234,
-  }
-  const preDate = new Date().getTime() // <== preDate
+  const fakePost = postBuilder({content: 'example is something special, so i can custom it'})
+  
+  const preDate = new Date().getTime()
 
   getByLabelText(/title/i).value = fakePost.title
   getByLabelText(/content/i).value = fakePost.content
@@ -50,7 +50,7 @@ test('render a form with title, content, tags and a submit button and mock react
     authorId: fakeUser.id,
   })
   expect(mockSavePost).toHaveBeenCalledTimes(1)
-  const postDate = new Date().getTime() // <== postDate
+  const postDate = new Date().getTime()
 
   const date = new Date(mockSavePost.mock.calls[0][0].date).getTime()
   expect(date).toBeGreaterThanOrEqual(preDate)
