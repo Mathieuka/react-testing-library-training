@@ -6,7 +6,8 @@ function Editor({user}) {
   const [isSaving, setIsSaving] = React.useState(false)
   const [redirect, setRedirect] = React.useState(false)
   const [error, setError] = React.useState(null)
-  function handleSubmit(e) {
+
+    const handleSubmit = async (e) => {
     e.preventDefault()
     const {title, content, tags} = e.target.elements
     const newPost = {
@@ -17,17 +18,19 @@ function Editor({user}) {
       authorId: user.id,
     }
     setIsSaving(true)
-    savePost(newPost).then(
-      () => setRedirect(true),
-      (response) => {
+    try {
+        await savePost(newPost)
+        setRedirect(true)
+    } catch (err) {
         setIsSaving(false)
-        setError(response.data.error)
-      },
-    )
+        setError(err.data.error)
+    }
   }
+
   if (redirect) {
     return <Redirect to="/" />
   }
+
   return (
     <form onSubmit={handleSubmit}>
       <label htmlFor="title-input">Title</label>
