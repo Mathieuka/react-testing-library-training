@@ -1,37 +1,43 @@
+import {render as rtlRender, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import * as React from 'react'
-import {Switch, Route, Link} from 'react-router-dom'
+import {
+    Link,
+    Route,
+    Switch,
+    useLocation,
+} from 'react-router-dom'
 
-const About = () => (
-  <div>
-    <h1>About</h1>
-    <p>You are on the about page</p>
-  </div>
-)
-const Home = () => (
-  <div>
-    <h1>Home</h1>
-    <p>You are home</p>
-  </div>
-)
-const NoMatch = () => (
-  <div>
-    <h1>404</h1>
-    <p>No match</p>
-  </div>
-)
+const About = () => <div>You are on the about page</div>
+const Home = () => <div>You are home</div>
+const NoMatch = () => <div>No match</div>
 
-function Main() {
-  return (
-    <div>
-      <Link to="/">Home</Link>
-      <Link to="/about">About</Link>
-      <Switch>
-        <Route exact path="/" component={Home} />
-        <Route path="/about" component={About} />
-        <Route component={NoMatch} />
-      </Switch>
-    </div>
-  )
+const LocationDisplay = () => {
+    const location = useLocation()
+
+    return <div data-testid="location-display">{location.pathname}</div>
 }
 
-export {Main}
+const App = () => (
+    <div>
+        <Link to="/">Home</Link>
+
+        <Link to="/about">About</Link>
+
+        <Switch>
+            <Route exact path="/">
+                <Home />
+            </Route>
+
+            <Route path="/about">
+                <About />
+            </Route>
+
+            <Route>
+                <NoMatch />
+            </Route>
+        </Switch>
+    </div>
+)
+
+export {App, LocationDisplay};
