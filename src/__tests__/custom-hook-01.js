@@ -1,19 +1,8 @@
-import React from 'react'
-import {render, act} from '@testing-library/react'
+import {renderHook, act} from '@testing-library/react-hooks'
 import {useCounter} from '../use-counter'
 
-function setup({initialProps} = {}) {
-  const result = {current: null}
-  function TestComponent(props) {
-    result.current = useCounter(props)
-    return null
-  }
-  render(<TestComponent {...initialProps} />)
-  return result
-}
-
 test('expose the count and increment/decrement functions', () => {
-  const result = setup()
+  const {result} = renderHook(useCounter)
   expect(result.current.count).toBe(0)
   act(() => result.current.increment())
   expect(result.current.count).toBe(1)
@@ -22,7 +11,9 @@ test('expose the count and increment/decrement functions', () => {
 })
 
 test('expose the count, set step to 2 and increment/decrement', () => {
-  const result = setup({initialProps: {initialCount: 0, step: 2}})
+  const {result} = renderHook(useCounter, {
+    initialProps: {initialCount: 0, step: 2},
+  })
   expect(result.current.count).toBe(0)
   act(() => result.current.increment())
   expect(result.current.count).toBe(2)
